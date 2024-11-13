@@ -98,6 +98,8 @@ Triangulation Transformation::Transformation::translation(Triangulation& triangu
 }
 
 
+
+
 using namespace Geometry;
 
 Triangulation Transformation::Transformation::rotation(Triangulation& triangulation, Geometry::Matrix4x4& matrix, double anglex, double angley, double anglez)

@@ -17,7 +17,7 @@ Visualizer::Visualizer(QWidget* parent)
 
     connect(loadFile, &QPushButton::clicked, this, &Visualizer::onLoadFileClick);
     connect(loadFile1, &QPushButton::clicked, this, &Visualizer::onLoadFileClick1);
-    connect(Join, &QPushButton::clicked, this, &Visualizer::onJoinClick);
+    connect(translate, &QPushButton::clicked, this, &Visualizer::onTranslateClick);
     connect(exportFile, &QPushButton::clicked, this, &Visualizer::onExportClick);
 }
 
@@ -30,7 +30,7 @@ void Visualizer::setupUi()
 {
     loadFile = new QPushButton("Load File1", this);
     loadFile1 = new QPushButton("Load File2", this);
-    Join = new QPushButton("Join", this);
+    translate = new QPushButton("Join", this);
     exportFile = new QPushButton("Export", this);
     openglWidgetInput = new OpenGlWidget(this);
     openglWidgetInput1 = new OpenGlWidget1(this);
@@ -41,7 +41,7 @@ void Visualizer::setupUi()
 
     layout->addWidget(loadFile, 0, 0);
     layout->addWidget(loadFile1, 0, 1);
-    layout->addWidget(Join, 0, 2);
+    layout->addWidget(translate, 0, 2);
     layout->addWidget(exportFile, 0, 3);
     layout->addWidget(openglWidgetInput, 1, 0, 1, 2);
     layout->addWidget(openglWidgetInput1, 1, 2, 1, 2);
@@ -95,8 +95,8 @@ void  Visualizer::onLoadFileClick1()
             OBJReader reader;
             reader.read(inputFilePath.toStdString(), triangulation1);
         }
-        OpenGlWidget1::Data data = convertTrianglulationToGraphicsObject1(triangulation1);
-        openglWidgetInput1->setData(data);
+        OpenGlWidget1::Data data1 = convertTrianglulationToGraphicsObject1(triangulation1);
+        openglWidgetInput1->setData1(data1);
     }
 }
 
@@ -151,11 +151,10 @@ void  Visualizer::onLoadFileClick1()
 //
 //}
 
-#include "TriangulationSetOperations.h"
-
-void Visualizer::onJoinClick()
+void Visualizer::onTranslateClick()
 {
     QFileDialog dialog(this);
+
     dialog.setFileMode(QFileDialog::Directory);
 
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
@@ -163,40 +162,113 @@ void Visualizer::onJoinClick()
         QFileDialog::ShowDirsOnly
         | QFileDialog::DontResolveSymlinks);
 
-    // Perform the join side by side operation on the two triangulations
-    Geometry::Triangulation resultTriangulation = Geometry::TriangulationSetOperations::joinSideBySide(triangulation, triangulation1);
-
-    // Check the file format and export the result accordingly
     if (inputFilePath.endsWith(".stl", Qt::CaseInsensitive))
     {
-        QString exportFileName = dir + "/output.obj";  // Set the export path for .obj
+        QString exportFileName = dir + "/output.obj";
+        Geometry::Matrix4x4 mat;
+        Transformation::Transformation t;
+
+        // Write the combined triangulation data to the output file
         ObjWriter writer;
-        writer.Write(exportFileName.toStdString(), resultTriangulation);
+        writer.Write(exportFileName.toStdString(), outputTriangulation);
 
-        // Reload the exported .obj file
+        // Reload file to check and load in output renderer
         OBJReader reader;
-        reader.read(exportFileName.toStdString(), resultTriangulation);
+        reader.read(exportFileName.toStdString(), outputTriangulation);
 
-        // Convert triangulation to graphics data and send to OpenGL widget
-        OpenGlWidget::Data data = convertTrianglulationToGraphicsObject(resultTriangulation);
-        openglWidgetOutput->setData(data);
-
+        // Convert triangulation to OpenGL data for rendering
+        OpenGlWidget::Data data = convertTrianglulationToGraphicsObject(triangulation);
+        //triangulation1 = t.translation(triangulation, mat, 10);
+        OpenGlWidget::Data data2 = convertTrianglulationToGraphicsObject(triangulation1);
+        for (auto i : data.normals)
+        {
+            data2.normals.append(i);
+        }
+        for (auto j : data.vertices)
+        {
+            data2.vertices.append(j);
+        }
+        openglWidgetOutput->setData(data2);
     }
     else if (inputFilePath.endsWith(".obj", Qt::CaseInsensitive))
     {
-        QString exportFileName = dir + "/output.stl";  // Set the export path for .stl
+        QString exportFileName = dir + "/output.stl";
+        Geometry::Matrix4x4 mat;
+        Transformation::Transformation t;
+
+        // Write the combined triangulation data to the output file
         STLWriter writer;
-        writer.Write(exportFileName.toStdString(), resultTriangulation);
+        writer.Write(exportFileName.toStdString(), outputTriangulation);
 
-        // Reload the exported .stl file
+        // Reload file to check and load in output renderer
         STLReader reader;
-        reader.read(exportFileName.toStdString(), resultTriangulation);
+        reader.read(exportFileName.toStdString(), outputTriangulation);
 
-        // Convert triangulation to graphics data and send to OpenGL widget
-        OpenGlWidget::Data data = convertTrianglulationToGraphicsObject(resultTriangulation);
-        openglWidgetOutput->setData(data);
+        // Convert triangulation to OpenGL data for rendering
+        OpenGlWidget::Data data = convertTrianglulationToGraphicsObject(triangulation);
+        OpenGlWidget::Data data1 = convertTrianglulationToGraphicsObject(triangulation1);
+        OpenGlWidget::Data data2;
+        
+        for (auto i : data.normals)
+        {
+            data2.normals.append(i);
+        }
+        for (auto j : data.vertices)
+        {
+            data2.vertices.append(j);
+        }
+        openglWidgetOutput->setData(data2);
     }
 }
+
+
+
+//#include "TriangulationSetOperations.h"
+//
+//void Visualizer::onJoinClick()
+//{
+//    QFileDialog dialog(this);
+//    dialog.setFileMode(QFileDialog::Directory);
+//
+//    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+//        "/home",
+//        QFileDialog::ShowDirsOnly
+//        | QFileDialog::DontResolveSymlinks);
+//
+//    // Perform the join side by side operation on the two triangulations
+//    Geometry::Triangulation resultTriangulation = Geometry::TriangulationSetOperations::joinSideBySide(triangulation, triangulation1);
+//
+//    // Check the file format and export the result accordingly
+//    if (inputFilePath.endsWith(".stl", Qt::CaseInsensitive))
+//    {
+//        QString exportFileName = dir + "/output.obj";  // Set the export path for .obj
+//        ObjWriter writer;
+//        writer.Write(exportFileName.toStdString(), resultTriangulation);
+//
+//        // Reload the exported .obj file
+//        OBJReader reader;
+//        reader.read(exportFileName.toStdString(), resultTriangulation);
+//
+//        // Convert triangulation to graphics data and send to OpenGL widget
+//        OpenGlWidget::Data data = convertTrianglulationToGraphicsObject(resultTriangulation);
+//        openglWidgetOutput->setData(data);
+//
+//    }
+//    else if (inputFilePath.endsWith(".obj", Qt::CaseInsensitive))
+//    {
+//        QString exportFileName = dir + "/output.stl";  // Set the export path for .stl
+//        STLWriter writer;
+//        writer.Write(exportFileName.toStdString(), resultTriangulation);
+//
+//        // Reload the exported .stl file
+//        STLReader reader;
+//        reader.read(exportFileName.toStdString(), resultTriangulation);
+//
+//        // Convert triangulation to graphics data and send to OpenGL widget
+//        OpenGlWidget::Data data = convertTrianglulationToGraphicsObject(resultTriangulation);
+//        openglWidgetOutput->setData(data);
+//    }
+//}
 
 
 

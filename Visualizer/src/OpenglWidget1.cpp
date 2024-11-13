@@ -16,7 +16,7 @@ OpenGlWidget1::~OpenGlWidget1() {
     doneCurrent();
 }
 
-void OpenGlWidget1::setData(Data inData)
+void OpenGlWidget1::setData1(Data inData)
 {
     data = inData;
     makeCurrent();

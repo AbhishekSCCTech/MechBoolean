@@ -24,7 +24,7 @@ public:
     explicit OpenGlWidget1(QWidget* parent = nullptr);
     ~OpenGlWidget1() override;
 
-    void setData(Data inData);
+    void setData1(Data inData);
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
     void sync(float zoomLevel, QVector3D rotation, QVector2D panOffset);

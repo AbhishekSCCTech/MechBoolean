@@ -1,4 +1,5 @@
 #include "OpenGlWidget.h"
+
 #include <QFile>
 #include <QDataStream>
 #include <QDebug>
@@ -24,6 +25,17 @@ void OpenGlWidget::setData(Data inData)
     update();
 }
 
+//void OpenGlWidget::loadObject(const QString& filePath) {
+//    if (objectLoader.loadFromFile(filePath)) {  // Assuming `loadFromFile` returns true if successful
+//        data.vertices = objectLoader.getVertices();
+//        data.normals = objectLoader.getNormals();
+//        setData(data);  // Re-using setData to update OpenGL data
+//    }
+//    else {
+//        qWarning() << "Failed to load object from file:" << filePath;
+//    }
+//}
+
 
 
 QSize OpenGlWidget::minimumSizeHint() const
@@ -42,6 +54,20 @@ void OpenGlWidget::sync(float inZoomLevel, QVector3D inRotation, QVector2D inPan
     rotation = inRotation;
     panOffset = inPanOffset;
     update();
+}
+
+OpenGlWidget::Data OpenGlWidget::operator+(const Data& other)
+{
+    Data newdata = data;
+    for (auto i : other.normals)
+    {
+        data.normals.append(i);
+    }
+    for (auto j : other.vertices)
+    {
+        data.vertices.append(j);
+    }
+    return data;
 }
 
 void OpenGlWidget::initializeGL()
