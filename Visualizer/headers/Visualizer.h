@@ -23,8 +23,7 @@ public:
 private slots:
     void onLoadFileClick();
     void onLoadFileClick1();
-    void onTranslateClick();
-    /*void onJoinClick();*/
+    void onJoinClick();
     void onExportClick();
 
 private:
@@ -39,8 +38,7 @@ private:
 
     QPushButton* loadFile;
     QPushButton* loadFile1;
-    /*QPushButton* Join;*/
-    QPushButton* translate;
+    QPushButton* join;
     QPushButton* exportFile;
 
     OpenGlWidget* openglWidgetInput;

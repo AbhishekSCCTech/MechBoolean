@@ -17,7 +17,7 @@ Visualizer::Visualizer(QWidget* parent)
 
     connect(loadFile, &QPushButton::clicked, this, &Visualizer::onLoadFileClick);
     connect(loadFile1, &QPushButton::clicked, this, &Visualizer::onLoadFileClick1);
-    connect(translate, &QPushButton::clicked, this, &Visualizer::onTranslateClick);
+    connect(join, &QPushButton::clicked, this, &Visualizer::onJoinClick);
     connect(exportFile, &QPushButton::clicked, this, &Visualizer::onExportClick);
 }
 
@@ -30,7 +30,7 @@ void Visualizer::setupUi()
 {
     loadFile = new QPushButton("Load File1", this);
     loadFile1 = new QPushButton("Load File2", this);
-    translate = new QPushButton("Join", this);
+    join = new QPushButton("Join", this);
     exportFile = new QPushButton("Export", this);
     openglWidgetInput = new OpenGlWidget(this);
     openglWidgetInput1 = new OpenGlWidget1(this);
@@ -41,7 +41,7 @@ void Visualizer::setupUi()
 
     layout->addWidget(loadFile, 0, 0);
     layout->addWidget(loadFile1, 0, 1);
-    layout->addWidget(translate, 0, 2);
+    layout->addWidget(join, 0, 2);
     layout->addWidget(exportFile, 0, 3);
     layout->addWidget(openglWidgetInput, 1, 0, 1, 2);
     layout->addWidget(openglWidgetInput1, 1, 2, 1, 2);
@@ -151,7 +151,7 @@ void  Visualizer::onLoadFileClick1()
 //
 //}
 
-void Visualizer::onTranslateClick()
+void Visualizer::onJoinClick()
 {
     QFileDialog dialog(this);
 
